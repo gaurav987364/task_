@@ -1,9 +1,26 @@
-import React from 'react'
+import React from 'react';
 
-const App = () => {
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
+import Home from './pages/Home';
+import FormLayout from './Layout/FormLayout';
+import UserInfo from './pages/UserInfo';
+import Address from './pages/Address';
+import Review from './pages/Review';
+
+const App:React.FC = () => {
   return (
-    <div>App</div>
+    <BrowserRouter>
+      <Routes>
+          <Route path='/' element={<Home/>}/>
+          <Route path='/formlayout' element={<FormLayout/>}>
+            <Route path='/formlayout/info' element={<UserInfo/>}/>
+            <Route path='/formlayout/address' element={<Address/>}/>
+            <Route path='/formlayout/review' element={<Review/>}/>
+          </Route>
+      </Routes>
+    </BrowserRouter>
   )
 }
 
-export default App
+export default App;
