@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useForm, type FieldErrors } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { FiUser, FiPhone, FiCalendar, FiActivity } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -66,7 +66,7 @@ const UserInfo = () => {
     setIsSubmitting(false);
   };
 
-  const onFormError = (errors: FieldErrors<UserInfoFormData>) => {
+  const onFormError = (errors:unknown) => {
     console.error("Form errors", errors);
   };
 
