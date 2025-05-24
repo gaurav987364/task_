@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiMoon, FiSun } from 'react-icons/fi';
+import { useTheme } from '../context/ThemeContext';
 
 const Navbar:React.FC = () => {
     const {mode,setMode} = useTheme();

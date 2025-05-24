@@ -1,11 +1,13 @@
 import React from 'react';
 import { FiArrowRight } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 
 const Home:React.FC = () => {
   return (
     <div className={`min-h-screen  transition-colors duration-300 `}>
       <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen">
+        <Navbar/>
         {/* Hero Section */}
         <main className="px-4 lg:px-12">
           <div className="max-w-5xl mx-auto">
