@@ -1,35 +1,50 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FiHome, FiMapPin, FiNavigation } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { AddressFormSchema, type AddressFormData } from '../schema/FormSchema';
+import { zodResolver } from '@hookform/resolvers/zod/src/zod.js';
+import { useDispatch, useSelector } from 'react-redux';
+import type { ActionState } from '../store/Store';
+import { addData } from '../slices/FormSlice';
 
-interface AddressForm {
-  addressLine1: string;
-  addressLine2?: string;
-  city: string;
-  state: string;
-  country: string;
-  pincode: string;
-}
+
 
 const AddressInfo = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+   const dispatch = useDispatch();
+  const storeData = useSelector((state:ActionState)=> state.formRed);
+  const navigate = useNavigate();
   
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors }
-  } = useForm<AddressForm>({
-    mode: 'onChange'
+  } = useForm<AddressFormData>({
+    mode: 'onChange',
+    resolver:zodResolver(AddressFormSchema),
+    defaultValues:{
+      addressLine1:storeData?.address?.addressLine1 || '',
+      addressLine2:storeData?.address?.addressLine2 || '',
+      city: storeData?.address?.city || '',
+      pincode:storeData?.address?.pincode || '',
+      state: storeData?.address?.state || '',
+      country: storeData?.address?.country || '',
+    }
   });
 
-  const onSubmit = async (data: AddressForm) => {
+  const onSubmit = async (data:AddressFormData) => {
     setIsSubmitting(true);
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     console.log('Address Data:', data);
+    dispatch(addData({address:data}));
     setIsSubmitting(false);
-    alert('Address information saved successfully!');
+    navigate('/formlayout/review');
+  };
+  const onFormError = (errors : unknown) => {
+    console.error("Form errors", errors);
   };
 
   const countries = [
@@ -47,6 +62,17 @@ const AddressInfo = () => {
     'Andaman and Nicobar Islands', 'Dadra and Nagar Haveli and Daman and Diu',
     'Lakshadweep'
   ];
+
+  //data persistence
+  useEffect(() => {
+    if (storeData && storeData.userInfo) {
+      const fields = storeData.userInfo;
+      Object.entries(fields).forEach(([key, value]) => {
+        setValue(key as keyof AddressFormData, value !== undefined && value !== null ? String(value) : '');
+      });
+    }
+  }, [storeData, setValue]);
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 lg:p-8">
@@ -69,7 +95,7 @@ const AddressInfo = () => {
         {/* Form */}
         <div className="space-y-8">
           <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-xl border border-gray-200 dark:border-gray-700">
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit,onFormError)}>
               {/* Street Address */}
               <div className="mb-8">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
@@ -230,13 +256,13 @@ const AddressInfo = () => {
                 </Link>
                 
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                 
-                  <Link 
-                    to="/formlayout/review"
+                  <button 
+                    type="submit"
+                    disabled={isSubmitting}
                     className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-semibold text-lg shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 text-center"
                   >
                     Next
-                  </Link>
+                  </button>
                 </div>
               </div>
             </form>

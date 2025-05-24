@@ -1,25 +1,20 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import React, { useEffect, useState } from 'react';
+import { useForm, type FieldErrors } from 'react-hook-form';
 import { FiUser, FiPhone, FiCalendar, FiActivity } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import {zodResolver} from "@hookform/resolvers/zod";
+import { UserInfoFormSchema, type UserInfoFormData } from '../schema/FormSchema';
+import {useDispatch,useSelector} from "react-redux";
+import type { ActionState } from '../store/Store';
+import { addData } from '../slices/FormSlice';
 
-interface UserInfoForm {
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  mobileNo: string;
-  email: string;
-  dob: string;
-  age: number;
-  bloodGroup: string;
-  height: string;
-  weight: string;
-  gender: 'male' | 'female' | 'other';
-  maritalStatus: 'single' | 'married' | 'divorced' | 'widowed';
-}
+
 
 const UserInfo = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const dispatch = useDispatch();
+  const storeData = useSelector((state:ActionState)=> state.formRed);
+  const navigate = useNavigate();
   
   const {
     register,
@@ -27,8 +22,23 @@ const UserInfo = () => {
     watch,
     setValue,
     formState: { errors }
-  } = useForm<UserInfoForm>({
-    mode: 'onChange'
+  } = useForm<UserInfoFormData>({
+    mode: 'onChange',
+    resolver:zodResolver(UserInfoFormSchema),
+    defaultValues:{
+      firstName:storeData?.userInfo?.firstName || '',
+      middleName: storeData?.userInfo?.middleName || '',
+      lastName: storeData?.userInfo?.lastName || '',
+      mobileNo: storeData?.userInfo?.mobileNo || '',
+      email: storeData?.userInfo?.email || '',
+      dob: storeData?.userInfo?.dob || '',
+      age: storeData?.userInfo?.age || 0,
+      bloodGroup: storeData?.userInfo?.bloodGroup || "O-",
+      gender: storeData?.userInfo?.gender || 'other',
+      height: storeData?.userInfo?.height || "",
+      weight: storeData?.userInfo?.weight || "",
+      maritalStatus: storeData?.userInfo?.maritalStatus || "widowed",
+    }
   });
 
   // Calculate age based on DOB
@@ -46,14 +56,30 @@ const UserInfo = () => {
     }
   }, [watchDob, setValue]);
 
-  const onSubmit = async (data: UserInfoForm) => {
+  const onSubmit = async (data:UserInfoFormData) => {
     setIsSubmitting(true);
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     console.log('Form Data:', data);
+    dispatch(addData({userInfo:data}));
+    navigate('/formlayout/address');
     setIsSubmitting(false);
-    alert('User information saved successfully!');
   };
+
+  const onFormError = (errors: FieldErrors<UserInfoFormData>) => {
+    console.error("Form errors", errors);
+  };
+
+  //data persistence
+  useEffect(() => {
+    if (storeData && storeData.userInfo) {
+      const fields = storeData.userInfo;
+      Object.entries(fields).forEach(([key, value]) => {
+        setValue(key as keyof UserInfoFormData, value);
+      });
+    }
+  }, [storeData, setValue]);
+
 
   const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
@@ -76,7 +102,7 @@ const UserInfo = () => {
         </div>
 
         {/* Form */}
-        <div className="space-y-8">
+        <form onSubmit={handleSubmit(onSubmit,onFormError)} className="space-y-8">
           <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-xl border border-gray-200 dark:border-gray-700">
             {/* Basic Information */}
             <div className="mb-8">
@@ -213,7 +239,8 @@ const UserInfo = () => {
                     Age
                   </label>
                   <input
-                    {...register('age')}
+                    type='number'
+                    {...register('age',{valueAsNumber:true})}
                     className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white transition-all duration-300 shadow-sm"
                     placeholder="Auto-calculated"
                     readOnly
@@ -352,16 +379,16 @@ const UserInfo = () => {
               >
                 Back
               </Link>
-              <Link 
-                to="/formlayout/address"
-                type="button"
+              <button
+                type="submit"
+                disabled={isSubmitting}
                 className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-semibold text-lg shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                Next
-              </Link>
+              </button>
             </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

@@ -5,64 +5,52 @@ import { FaCheckCircle } from 'react-icons/fa';
 import { FaCalendar, FaPhone } from 'react-icons/fa6';
 import { FiEdit3, FiMail } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
-
-interface UserData {
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  mobileNo: string;
-  email: string;
-  dob: string;
-  age: number;
-  bloodGroup: string;
-  height: string;
-  weight: string;
-  gender: string;
-  maritalStatus: string;
-}
-
-interface AddressData {
-  addressLine1: string;
-  addressLine2?: string;
-  city: string;
-  state: string;
-  country: string;
-  pincode: string;
-}
+import type { AddressFormData, UserInfoFormData } from '../schema/FormSchema';
+import toast from 'react-hot-toast';
+import { useSelector } from 'react-redux';
+import type { ActionState } from '../store/Store';
 
 const Review = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isAgreed, setIsAgreed] = useState(false);
+
+  const storeData = useSelector((state:ActionState)=> state.formRed);
+
 
   // Sample data - in real app, this would come from your form state/context
-  const userData: UserData = {
-    firstName: 'John',
-    middleName: 'Michael',
-    lastName: 'Doe',
-    mobileNo: '9876543210',
-    email: 'john.doe@example.com',
-    dob: '1990-05-15',
-    age: 33,
-    bloodGroup: 'O+',
-    height: '175',
-    weight: '70.5',
-    gender: 'male',
-    maritalStatus: 'single'
+  const userData: UserInfoFormData = {
+    firstName: storeData?.userInfo?.firstName || '',
+    middleName: storeData?.userInfo?.middleName || '',
+    lastName: storeData?.userInfo?.lastName || '',
+    mobileNo: storeData?.userInfo?.mobileNo || '',
+    email: storeData?.userInfo?.email || '',
+    dob: storeData?.userInfo?.dob || '',
+    age: storeData?.userInfo?.age || 0,
+    bloodGroup: storeData?.userInfo?.bloodGroup || 'O-',
+    height: storeData?.userInfo?.height || '',
+    weight: storeData?.userInfo?.weight || '',
+    gender: storeData?.userInfo?.gender || 'other',
+    maritalStatus: storeData?.userInfo?.maritalStatus || 'widowed'
   };
 
-  const addressData: AddressData = {
-    addressLine1: '123 Main Street, Downtown',
-    addressLine2: 'Apartment 4B',
-    city: 'Mumbai',
-    state: 'Maharashtra',
-    country: 'India',
-    pincode: '400001'
+  const addressData: AddressFormData = {
+    addressLine1: storeData?.address?.addressLine1 || '',
+    addressLine2: storeData?.address?.addressLine2 || '',
+    city: storeData?.address?.city || '',
+    state: storeData?.address?.state || '',
+    country: storeData?.address?.country || '',
+    pincode: storeData?.address?.pincode || ''
   };
 
   const handleFinalSubmit = async () => {
+    if(!isAgreed){
+      toast.error("Please agree to terms and conditions!")
+    }
     setIsSubmitting(true);
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 2000));
+    toast.success("Your form has been submitted successfully!")
     setIsSubmitting(false);
     setIsSubmitted(true);
   };
@@ -311,13 +299,15 @@ const Review = () => {
                 </p>
                 <label className="flex items-center cursor-pointer">
                   <input 
-                    type="checkbox" 
+                    id='terms'
+                    type="checkbox"
+                    checked={isAgreed}
+                    onChange={(e) => setIsAgreed(e.target.checked)} 
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-3"
-                    defaultChecked
                   />
-                  <span className="text-blue-800 dark:text-blue-200 text-sm">
+                  <label htmlFor='terms' className="text-blue-800 dark:text-blue-200 text-sm">
                     I confirm that all information provided is accurate and complete
-                  </span>
+                  </label>
                 </label>
               </div>
             </div>
@@ -336,7 +326,7 @@ const Review = () => {
           
           <button
             onClick={handleFinalSubmit}
-            disabled={isSubmitting}
+            disabled={!isAgreed || isSubmitting}
             className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white rounded-xl font-semibold text-lg shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
           >
             {isSubmitting ? (
