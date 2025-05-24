@@ -1,27 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react';
 import { FiMoon, FiSun } from 'react-icons/fi';
 
 const Navbar:React.FC = () => {
-     const [darkMode, setDarkMode] = useState(false);
+    const {mode,setMode} = useTheme();
 
-    useEffect(() => {
-        // Check if user has a preference stored or prefers dark mode
-        const isDark = localStorage.getItem('darkMode') === 'true' || 
-                    (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        setDarkMode(isDark);
-    }, []);
-
-    useEffect(() => {
-        localStorage.setItem('darkMode', darkMode.toString());
-        if (darkMode) {
-        document.documentElement.classList.add('dark');
-        } else {
-        document.documentElement.classList.remove('dark');
-        }
-    }, [darkMode]);
-
-    const toggleDarkMode = () => {
-        setDarkMode(!darkMode);
+    const handleToggle = ()=>{
+        setMode(!mode);
     };
   return (
   <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
@@ -38,10 +22,10 @@ const Navbar:React.FC = () => {
             </div>
             
             <button
-              onClick={toggleDarkMode}
+              onClick={handleToggle}
               className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-500"
             >
-              {darkMode ? (
+              {mode ? (
                 <FiSun className="w-5 h-5 text-yellow-500" />
               ) : (
                 <FiMoon className="w-5 h-5 text-gray-600" />

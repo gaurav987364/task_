@@ -346,12 +346,12 @@ const UserInfo = () => {
             </div>
 
             <div className="flex justify-between pt-6">
-              <button
-                type="button"
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-semibold text-lg shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+               <Link 
+                to="/"
+                className="w-full sm:w-auto px-8 py-4 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 text-center"
               >
-               Back
-              </button>
+                Back
+              </Link>
               <Link 
                 to="/formlayout/address"
                 type="button"
