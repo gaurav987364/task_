@@ -4,11 +4,12 @@ import { BsActivity } from 'react-icons/bs';
 import { FaCheckCircle } from 'react-icons/fa';
 import { FaCalendar, FaPhone } from 'react-icons/fa6';
 import { FiEdit3, FiMail } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { AddressFormData, UserInfoFormData } from '../schema/FormSchema';
 import toast from 'react-hot-toast';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import type { ActionState } from '../store/Store';
+import { addData } from '../slices/FormSlice';
 
 const Review = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,6 +17,8 @@ const Review = () => {
   const [isAgreed, setIsAgreed] = useState(false);
 
   const storeData = useSelector((state:ActionState)=> state.formRed);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
 
   // Sample data - in real app, this would come from your form state/context
@@ -44,10 +47,19 @@ const Review = () => {
   };
 
   const handleFinalSubmit = async () => {
+    if(!userData && addressData) return toast.error("Please fill all the fields!")
     if(!isAgreed){
       toast.error("Please agree to terms and conditions!")
     }
     setIsSubmitting(true);
+    const newObj = {
+      ...userData,
+      ...addressData,
+      isAgreed:isAgreed,
+      createdAt: new Date().toISOString(),
+    };
+    dispatch(addData(newObj));
+    console.log(newObj);
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 2000));
     toast.success("Your form has been submitted successfully!")
@@ -59,6 +71,11 @@ const Review = () => {
     console.log(`Edit ${section} section`);
     // In real app, navigate back to specific form section
   };
+
+  const goTo = ()=>{
+    navigate("/")
+    window.location.reload();
+  }
 
   if (isSubmitted) {
     return (
@@ -106,14 +123,14 @@ const Review = () => {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => console.log('Go to dashboard')}
+              <Link 
+               to="/"
                 className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-semibold text-lg shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300"
               >
                 Go to Dashboard
-              </button>
+              </Link>
               <button
-                onClick={() => window.location.reload()}
+                onClick={goTo}
                 className="px-8 py-4 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
               >
                 Start New Registration
@@ -326,7 +343,12 @@ const Review = () => {
           
           <button
             onClick={handleFinalSubmit}
-            disabled={!isAgreed || isSubmitting}
+            disabled={
+              isSubmitting ||
+              !Object.values(userData).every(val => val !== '' && val !== 0) ||
+              !Object.values(addressData).every(val => val !== '') ||
+              !isAgreed
+            }
             className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white rounded-xl font-semibold text-lg shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
           >
             {isSubmitting ? (
