@@ -62,4 +62,4 @@ const GridSection = () => {
   )
 }
 
-export default GridSection
+export default GridSection;
