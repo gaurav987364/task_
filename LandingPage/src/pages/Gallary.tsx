@@ -1,5 +1,3 @@
-import React from 'react'
-
 const Gallary = () => {
   return (
      <section className="bg-black text-white px-4 md:px-10 lg:px-20 py-16">
@@ -81,4 +79,4 @@ const Gallary = () => {
   )
 }
 
-export default Gallary
+export default Gallary;
