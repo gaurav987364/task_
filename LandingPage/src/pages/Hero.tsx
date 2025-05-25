@@ -1,4 +1,4 @@
-import { HiMenu } from 'react-icons/hi'
+import { HiMenu } from 'react-icons/hi';
 
 const Hero = () => {
   return (

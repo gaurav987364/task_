@@ -1,5 +1,4 @@
-
-import { BsStars } from 'react-icons/bs'
+import { BsStars } from 'react-icons/bs';
 
 const SectionThree = () => {
   return (
@@ -60,4 +59,4 @@ const SectionThree = () => {
   )
 }
 
-export default SectionThree
+export default SectionThree;
